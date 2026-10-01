@@ -1,0 +1,241 @@
+@import "tailwindcss";
+
+/* Matrix terminal palette. Legacy token names are retained for existing UI. */
+:root {
+  --bg: #000600;
+  --bg-soft: #010c02;
+  --panel: #041a08;
+  --panel-2: #062610;
+  --border: #0f5a24;
+  --gold: #22ff66;
+  --gold-soft: #7dffa6;
+  --purple: #12b23f;
+  --text: #33ff77;
+  --muted: #2a9d55;
+  --green-deep: #063d18;
+  --scan: rgba(0, 255, 90, 0.04);
+  --die-surface-light: #0b2e1c;
+  --die-surface: #03140b;
+  --die-surface-dark: #010a05;
+  --die-edge: #40f58a;
+  --die-ink: #adffd0;
+}
+
+@theme inline {
+  --font-serif: var(--font-cinzel);
+  --font-sans: var(--font-inter);
+}
+
+html, body {
+  background: #000;
+  color: var(--text);
+  font-family: var(--font-cinzel), "Courier New", monospace;
+  letter-spacing: 0.02em;
+}
+body {
+  min-height: 100vh;
+  text-shadow: 0 0 4px rgba(34, 255, 102, 0.35);
+}
+
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  pointer-events: none;
+  background: repeating-linear-gradient(to bottom, var(--scan) 0px, var(--scan) 1px, transparent 2px, transparent 4px);
+  mix-blend-mode: screen;
+}
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 51;
+  pointer-events: none;
+  background: radial-gradient(120% 120% at 50% 50%, transparent 55%, rgba(0, 0, 0, 0.55) 100%);
+}
+.font-serif {
+  font-family: var(--font-cinzel), "Courier New", monospace;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+.term-panel {
+  background: linear-gradient(180deg, rgba(4, 26, 8, 0.92), rgba(1, 12, 2, 0.92));
+  border: 1px solid var(--border);
+  box-shadow: 0 0 0 1px rgba(0, 255, 90, 0.05) inset, 0 0 18px rgba(0, 255, 90, 0.08), 0 0 40px rgba(0, 0, 0, 0.6);
+}
+
+/* All UI symbols are vector line work, not platform-dependent emoji. */
+.terminal-icon {
+  display: inline-block;
+  flex-shrink: 0;
+  color: var(--gold);
+  vertical-align: middle;
+  filter: drop-shadow(0 0 3px rgba(34, 255, 102, 0.2));
+}
+.terminal-icon-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 32px;
+  min-height: 32px;
+  border: 1px solid transparent;
+  transition: background-color 150ms, border-color 150ms;
+}
+.terminal-icon-button:hover:not(:disabled), .terminal-icon-button:focus-visible {
+  border-color: var(--border);
+  background: rgba(34, 255, 102, 0.08);
+}
+.terminal-icon-button:disabled { opacity: 0.4; }
+
+@keyframes blink {
+  0%, 49% { opacity: 1; }
+  50%, 100% { opacity: 0; }
+}
+.term-cursor::after {
+  content: "▊";
+  margin-left: 2px;
+  animation: blink 1s step-end infinite;
+  color: var(--gold);
+}
+.blink { animation: blink 1.1s step-end infinite; }
+@keyframes flicker {
+  0%, 92%, 94%, 97%, 100% { opacity: 1; }
+  93% { opacity: 0.65; }
+  96% { opacity: 0.8; }
+}
+.flicker { animation: flicker 4s infinite; }
+.parchment-scroll::-webkit-scrollbar { width: 8px; }
+.parchment-scroll::-webkit-scrollbar-track { background: rgba(0, 40, 12, 0.3); }
+.parchment-scroll::-webkit-scrollbar-thumb { background: var(--green-deep); border: 1px solid var(--border); border-radius: 0; }
+.parchment-scroll::-webkit-scrollbar-thumb:hover { background: var(--purple); }
+@keyframes fade-up {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.fade-up { animation: fade-up 0.4s ease-out both; }
+@keyframes pulse-dot {
+  0%, 100% { opacity: 0.25; }
+  50% { opacity: 1; }
+}
+.typing-dot { animation: pulse-dot 1.2s infinite; }
+
+/* Holographic polyhedral dice: dark glass, green mesh, phosphor readouts. */
+.matrix-die { flex: 0 0 auto; }
+.matrix-die-motion { width: 100%; height: 100%; transform-origin: 50% 55%; }
+.matrix-die svg { overflow: visible; filter: drop-shadow(0 0 3px rgba(34, 255, 102, 0.28)); }
+.matrix-die-shell { stroke: var(--die-edge); stroke-width: 1.8; stroke-linejoin: miter; }
+.matrix-die-edges { fill: none; stroke: var(--die-edge); stroke-width: 1.3; opacity: 0.62; }
+.matrix-die-value {
+  fill: var(--die-ink);
+  font-family: var(--font-cinzel), "Courier New", monospace;
+  font-weight: 400;
+  letter-spacing: -0.04em;
+  paint-order: stroke fill;
+  stroke: var(--die-surface-dark);
+  stroke-width: 0.7;
+  text-shadow: 0 0 5px rgba(95, 255, 152, 0.55);
+}
+.matrix-die[data-die-state="high"] svg { filter: drop-shadow(0 0 7px rgba(64, 245, 138, 0.6)); }
+.matrix-die[data-die-state="high"] .matrix-die-shell { stroke: var(--die-ink); }
+.matrix-die[data-die-state="low"] .matrix-die-shell { stroke-dasharray: 5 2; }
+.matrix-die[data-die-state="low"] .matrix-die-edges { opacity: 0.4; }
+.matrix-die[data-rolling="true"] svg { filter: drop-shadow(0 0 6px rgba(64, 245, 138, 0.45)); }
+.die-glyph { color: inherit; flex-shrink: 0; overflow: visible; }
+@keyframes die-tumble {
+  0% { transform: perspective(340px) rotateX(0deg) rotateY(0deg) rotateZ(0deg) scale(0.94); }
+  25% { transform: perspective(340px) rotateX(30deg) rotateY(-24deg) rotateZ(120deg) translateY(-9px); }
+  55% { transform: perspective(340px) rotateX(-18deg) rotateY(22deg) rotateZ(285deg) scale(1.07); }
+  80% { transform: perspective(340px) rotateX(15deg) rotateY(-10deg) rotateZ(460deg) translateY(-4px); }
+  100% { transform: perspective(340px) rotateX(0deg) rotateY(0deg) rotateZ(720deg) scale(1); }
+}
+.die-tumbling { animation: die-tumble 1.1s cubic-bezier(0.34, 0.8, 0.4, 1) infinite; }
+@keyframes die-settle {
+  0% { transform: scale(1.12) rotate(-5deg); }
+  55% { transform: scale(0.97) rotate(2deg); }
+  100% { transform: scale(1) rotate(0deg); }
+}
+.die-settled { animation: die-settle 0.4s ease-out both; }
+@keyframes die-scan { from { transform: translateY(0); } to { transform: translateY(140px); } }
+.matrix-die-scan { animation: die-scan 1s linear infinite; }
+
+.matrix-dice-stage {
+  position: relative;
+  isolation: isolate;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  min-height: 238px;
+  padding: 16px;
+  border: 1px solid var(--border);
+  background-color: var(--die-surface-dark);
+  background-image: linear-gradient(rgba(64, 245, 138, 0.045) 1px, transparent 1px), linear-gradient(90deg, rgba(64, 245, 138, 0.045) 1px, transparent 1px), radial-gradient(ellipse at 50% 50%, rgba(8, 56, 29, 0.7), transparent 75%);
+  background-size: 24px 24px, 24px 24px, 100% 100%;
+  box-shadow: inset 0 0 32px rgba(0, 0, 0, 0.4);
+}
+.matrix-dice-stage::before {
+  content: "";
+  position: absolute;
+  inset: 6px;
+  pointer-events: none;
+  opacity: 0.65;
+  background:
+    linear-gradient(var(--die-edge), var(--die-edge)) left top / 8px 1px no-repeat,
+    linear-gradient(var(--die-edge), var(--die-edge)) left top / 1px 8px no-repeat,
+    linear-gradient(var(--die-edge), var(--die-edge)) right top / 8px 1px no-repeat,
+    linear-gradient(var(--die-edge), var(--die-edge)) right top / 1px 8px no-repeat,
+    linear-gradient(var(--die-edge), var(--die-edge)) left bottom / 8px 1px no-repeat,
+    linear-gradient(var(--die-edge), var(--die-edge)) left bottom / 1px 8px no-repeat,
+    linear-gradient(var(--die-edge), var(--die-edge)) right bottom / 8px 1px no-repeat,
+    linear-gradient(var(--die-edge), var(--die-edge)) right bottom / 1px 8px no-repeat;
+}
+.matrix-dice-stage[data-rolling="true"] { border-color: var(--die-edge); }
+.matrix-stage-label { display: flex; justify-content: space-between; width: 100%; color: var(--muted); font-size: 9px; letter-spacing: 0.16em; text-transform: uppercase; }
+.matrix-dice-display { flex: 1; min-height: 84px; display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 6px; width: 100%; padding: 2px 0; }
+.matrix-die-option { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 5px; min-height: 62px; }
+.matrix-die-option[aria-pressed="true"] .die-glyph { filter: drop-shadow(0 0 3px rgba(64, 245, 138, 0.4)); }
+.matrix-result { color: var(--die-ink); text-shadow: 0 0 10px rgba(34, 255, 102, 0.4); }
+.matrix-roll-card { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; border: 1px solid var(--border); border-left: 2px solid var(--die-edge); border-radius: 0; padding: 10px 14px; background: linear-gradient(125deg, #04190b, #010a05); box-shadow: inset 0 0 20px rgba(34, 255, 102, 0.025); }
+@keyframes dice-pop {
+  0% { transform: scale(0.65); opacity: 0; }
+  65% { transform: scale(1.1); opacity: 1; }
+  100% { transform: scale(1); }
+}
+.dice-pop { animation: dice-pop 0.4s ease-out both; }
+@keyframes dice-card-in {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.dice-card { animation: dice-card-in 0.35s ease-out both; }
+
+input[type="range"] { accent-color: var(--gold); }
+input, textarea, select { font-family: var(--font-cinzel), "Courier New", monospace; }
+input::placeholder, textarea::placeholder { color: rgba(42, 157, 85, 0.7); }
+select option { background: #021005; color: var(--text); }
+.matrix-terminal-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 16px;
+  border-bottom: 1px solid var(--border);
+  background: rgba(1, 10, 5, 0.92);
+  color: var(--muted);
+  font-size: 10px;
+  letter-spacing: 0.08em;
+}
+.matrix-live-dot { display: inline-block; width: 5px; height: 5px; background: var(--gold); box-shadow: 0 0 8px rgba(34, 255, 102, 0.6); }
+.matrix-ascii-frame { overflow-x: auto; border: 1px solid var(--border); padding: 20px 12px; background: repeating-linear-gradient(0deg, rgba(34,255,102,0.02) 0, rgba(34,255,102,0.02) 1px, transparent 1px, transparent 4px), #010a04; }
+.matrix-ascii { width: max-content; margin: 0 auto; color: var(--gold); font-family: var(--font-cinzel), "Courier New", monospace; font-size: clamp(10px, 2.7vw, 15px); line-height: 1.5; text-shadow: 0 0 8px rgba(34,255,102,0.25); }
+.matrix-filter { border: 1px solid var(--border); padding: 5px 8px; color: var(--muted); font-size: 10px; cursor: pointer; }
+.matrix-filter:hover, .matrix-filter.active { border-color: var(--gold); color: var(--gold-soft); background: rgba(34,255,102,0.06); }
+.matrix-pressure { border: 1px solid var(--border); background: radial-gradient(ellipse at 30% 10%, #072315, #010b04); padding: 12px; }
+button:not(:disabled), select { cursor: pointer; }
+button:disabled { cursor: not-allowed; }
+:focus-visible { outline: 1px solid var(--gold); outline-offset: 3px; }
+
+@media (prefers-reduced-motion: reduce) {
+  .flicker, .blink, .term-cursor::after, .die-tumbling, .die-settled, .matrix-die-scan, .dice-pop, .dice-card, .fade-up { animation: none; }
+  .matrix-die-scan { display: none; }
+}

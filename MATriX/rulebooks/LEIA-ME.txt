@@ -1,0 +1,10 @@
+MATRIX — REGRAS INCORPORADAS
+
+A edição atual do app é dedicada ao Matrix RPG de Dan Aguiar / Artefato.
+As regras enviadas pelo jogador estão em src/lib/matrix/rulebook.ts.
+
+Não é necessário copiar ou enviar PDF. Esta pasta existe somente por
+compatibilidade com instalações anteriores; seus PDFs não são indexados
+nem substituem as regras na edição Matrix.
+
+Os dados de campanhas antigas não são apagados.
